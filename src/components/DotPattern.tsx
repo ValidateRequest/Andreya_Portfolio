@@ -26,8 +26,8 @@ export function DotPattern({ className = '' }: DotPatternProps) {
             cx={c * gap + gap / 2}
             cy={r * gap + gap / 2}
             r={1.6}
-            fill="#2db3a3"
-            opacity={fade} />);
+            fill="#A58A72"
+            opacity={fade * 0.55} />);
 
 
       })

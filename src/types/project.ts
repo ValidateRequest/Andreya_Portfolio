@@ -1,8 +1,9 @@
 export type ProjectCategory =
-'Data Analytics' |
-'IT / Systems' |
-'Database' |
-'Business Intelligence';
+  | 'Virtual Assistance'
+  | 'Data Analytics'
+  | 'IT / Systems'
+  | 'Database'
+  | 'Business Intelligence';
 
 export interface Project {
   id: string;

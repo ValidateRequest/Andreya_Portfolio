@@ -11,8 +11,8 @@
 html,
 body,
 #root {
-  background-color: #1c2124;
-  color: #f1efe9;
+  background-color: #FFFFFF;
+  color: #3B2D25;
   min-height: 100%;
 }
 body {
@@ -21,11 +21,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 ::selection {
-  background: #2db3a3;
-  color: #1c2124;
+  background: #E8DCCB;
+  color: #3B2D25;
 }
 :focus-visible {
-  outline: 2px solid #2db3a3;
+  outline: 2px solid #A58A72;
   outline-offset: 3px;
 }
 @media (prefers-reduced-motion: reduce) {

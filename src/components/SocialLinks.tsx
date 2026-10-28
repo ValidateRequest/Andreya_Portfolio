@@ -16,8 +16,7 @@ export function SocialLinks({ className = '' }: SocialLinksProps) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="LinkedIn profile (opens in a new tab)"
-          className={`${itemClass} text-paper transition-colors duration-150 hover:text-teal-light`}>
-          
+          className={`${itemClass} text-espresso transition-colors duration-150 hover:text-taupe`}>
           <BrandIcon name="linkedin" />
         </a>
       </li>
@@ -28,12 +27,10 @@ export function SocialLinks({ className = '' }: SocialLinksProps) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub profile (opens in a new tab)"
-          className={`${itemClass} text-paper transition-colors duration-150 hover:text-teal-light`}>
-          
+          className={`${itemClass} text-espresso transition-colors duration-150 hover:text-taupe`}>
             <BrandIcon name="github" />
           </a> :
-
-        <span className={`${itemClass} text-paper/30`} title="GitHub profile coming soon">
+        <span className={`${itemClass} text-espresso/30`} title="GitHub profile coming soon">
             <BrandIcon name="github" />
             <span className="sr-only">GitHub profile coming soon</span>
           </span>

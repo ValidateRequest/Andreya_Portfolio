@@ -1,52 +1,90 @@
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircleIcon, CheckIcon, Loader2Icon } from 'lucide-react';
-import { useContactForm } from '../hooks/useContactForm';
-import type { ContactFields } from '../hooks/useContactForm';
+import { AlertCircleIcon, CheckIcon, Loader2Icon, SendIcon } from 'lucide-react';
 import { buttonClasses } from '../utils/button';
 import { profile } from '../data/profile';
 
-const fieldClass =
-  'w-full border bg-ink px-4 py-3 text-paper placeholder:text-muted/70 transition-[border-color] duration-150 focus:border-teal focus:outline-none';
+const inputClass =
+  'w-full border border-line bg-white px-4 py-3 text-base sm:text-sm text-espresso placeholder:text-muted/60 transition-[border-color,box-shadow] duration-150 focus:border-taupe focus:ring-1 focus:ring-taupe focus:outline-none rounded-none';
 
 export function ContactForm() {
-  const accessKey = profile.web3FormsAccessKey || 'a00140ed-1808-4e0e-9b61-7b9ba008dfc2';
-  const { values, errors, status, serverError, update, handleSubmit, reset } = useContactForm(accessKey);
+  const [result, setResult] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const accessKey = profile.web3FormsAccessKey || '5af8f68c-63e8-4e7c-94f2-9908bcf94b09';
 
-  const fields: { key: keyof ContactFields; label: string; type: string; autoComplete?: string }[] = [
-    { key: 'name', label: 'Name', type: 'text', autoComplete: 'name' },
-    { key: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
-    { key: 'subject', label: 'Subject', type: 'text' }
-  ];
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setResult('Sending....');
+    setErrorMessage('');
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.append('access_key', accessKey);
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setResult('Form Submitted Successfully');
+        form.reset();
+      } else {
+        setResult('Error');
+        setErrorMessage(data.message || 'Something went wrong while submitting. Please try again.');
+      }
+    } catch {
+      setResult('Error');
+      setErrorMessage('Unable to reach the email server. Please check your connection or email me directly.');
+    }
+  };
+
+  const handleReset = () => {
+    setResult('');
+    setErrorMessage('');
+  };
 
   return (
-    <div className="border border-line bg-surface p-6 sm:p-10">
+    <div className="w-full">
       <AnimatePresence mode="wait" initial={false}>
-        {status === 'sent' ? (
+        {result === 'Form Submitted Successfully' ? (
           <motion.div
-            key="sent"
+            key="success"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
             role="status"
-            className="py-10"
+            className="border border-line bg-beige/30 p-8 sm:p-10 text-center sm:text-left"
           >
-            <span className="flex h-12 w-12 items-center justify-center bg-teal/15 text-teal">
+            <span className="inline-flex h-12 w-12 items-center justify-center bg-taupe/15 text-taupe">
               <CheckIcon aria-hidden="true" className="h-6 w-6" />
             </span>
-            <h2 className="mt-6 font-serif text-3xl text-paper">Message Sent!</h2>
-            <p className="mt-3 max-w-md leading-relaxed text-muted">
-              Thank you for reaching out. Your message has been sent directly to my inbox, and I will get back to you as soon as possible.
+            <h3 className="mt-5 font-serif text-2xl text-espresso sm:text-3xl">
+              Form Submitted Successfully
+            </h3>
+            <p className="mt-3 max-w-lg leading-relaxed text-muted text-sm sm:text-base">
+              Thank you for reaching out! Your message has been delivered directly to my inbox, and I will get back to you shortly.
             </p>
-            <p className="mt-4 text-sm text-muted">
-              Need an immediate answer? You can also contact me directly at{' '}
-              <a href={`mailto:${profile.email}`} className="text-teal hover:text-teal-light underline underline-offset-2">
+            <p className="mt-4 text-xs sm:text-sm text-muted">
+              Need immediate assistance? You can also reach me directly at{' '}
+              <a
+                href={`mailto:${profile.email}`}
+                className="text-taupe underline underline-offset-2 hover:text-taupe-deep font-medium"
+              >
                 {profile.email}
               </a>
               .
             </p>
-            <button type="button" onClick={reset} className={buttonClasses('outline', 'mt-8')}>
-              Send another message
+            <button
+              type="button"
+              onClick={handleReset}
+              className={buttonClasses('outline', 'mt-8')}
+            >
+              Send Another Message
             </button>
           </motion.div>
         ) : (
@@ -56,97 +94,128 @@ export function ContactForm() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            onSubmit={handleSubmit}
-            noValidate
-            aria-label="Contact form"
+            onSubmit={onSubmit}
+            className="space-y-6"
+            aria-label="Contact inquiry form"
           >
-            {/* Web3Forms configuration fields */}
-            <input type="hidden" name="access_key" value={accessKey} />
-            <input type="hidden" name="from_name" value={values.name || 'Portfolio Visitor'} />
+            {/* Web3Forms spam honeypot */}
             <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              {fields.map((field) => (
-                <div key={field.key} className={field.key === 'subject' ? 'sm:col-span-2' : ''}>
-                  <label
-                    htmlFor={`contact-${field.key}`}
-                    className="block font-mono text-xs uppercase tracking-[0.14em] text-paper/85"
-                  >
-                    {field.label}
-                  </label>
-                  <input
-                    id={`contact-${field.key}`}
-                    name={field.key}
-                    type={field.type}
-                    autoComplete={field.autoComplete}
-                    value={values[field.key]}
-                    onChange={update(field.key)}
-                    aria-invalid={Boolean(errors[field.key])}
-                    aria-describedby={errors[field.key] ? `contact-${field.key}-error` : undefined}
-                    className={`${fieldClass} mt-2 ${errors[field.key] ? 'border-red-400' : 'border-line'}`}
-                  />
-                  {errors[field.key] && (
-                    <p id={`contact-${field.key}-error`} className="mt-2 text-sm text-red-300">
-                      {errors[field.key]}
-                    </p>
-                  )}
-                </div>
-              ))}
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              {/* Name */}
+              <div>
+                <label
+                  htmlFor="contact-name"
+                  className="block font-mono text-xs uppercase tracking-[0.14em] text-espresso font-medium"
+                >
+                  Your Name <span className="text-taupe">*</span>
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  name="name"
+                  required
+                  autoComplete="name"
+                  placeholder="e.g. Alex Morgan"
+                  className={`${inputClass} mt-2`}
+                />
+              </div>
 
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="contact-email"
+                  className="block font-mono text-xs uppercase tracking-[0.14em] text-espresso font-medium"
+                >
+                  Email Address <span className="text-taupe">*</span>
+                </label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  name="email"
+                  required
+                  autoComplete="email"
+                  placeholder="alex@example.com"
+                  className={`${inputClass} mt-2`}
+                />
+              </div>
+
+              {/* Subject */}
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="contact-subject"
+                  className="block font-mono text-xs uppercase tracking-[0.14em] text-espresso font-medium"
+                >
+                  Subject / Topic
+                </label>
+                <input
+                  id="contact-subject"
+                  type="text"
+                  name="subject"
+                  placeholder="IT Support, Data Analytics, Virtual Assistance, or General Inquiry"
+                  className={`${inputClass} mt-2`}
+                />
+              </div>
+
+              {/* Message */}
               <div className="sm:col-span-2">
                 <label
                   htmlFor="contact-message"
-                  className="block font-mono text-xs uppercase tracking-[0.14em] text-paper/85"
+                  className="block font-mono text-xs uppercase tracking-[0.14em] text-espresso font-medium"
                 >
-                  Message
+                  Message <span className="text-taupe">*</span>
                 </label>
                 <textarea
                   id="contact-message"
                   name="message"
-                  rows={6}
-                  value={values.message}
-                  onChange={update('message')}
-                  aria-invalid={Boolean(errors.message)}
-                  aria-describedby={errors.message ? 'contact-message-error' : undefined}
-                  className={`${fieldClass} mt-2 resize-y ${errors.message ? 'border-red-400' : 'border-line'}`}
+                  required
+                  rows={5}
+                  placeholder="Tell me a bit about what you need assistance with..."
+                  className={`${inputClass} mt-2 resize-y`}
                 />
-                {errors.message && (
-                  <p id="contact-message-error" className="mt-2 text-sm text-red-300">
-                    {errors.message}
-                  </p>
-                )}
               </div>
             </div>
 
-            {serverError && (
+            {/* Error Message Alert */}
+            {result === 'Error' && (
               <div
                 role="alert"
-                className="mt-6 flex items-start gap-3 border border-red-400/40 bg-red-950/30 p-4 text-sm text-red-200"
+                className="flex items-start gap-3 border border-red-200 bg-red-50 p-4 text-sm text-red-800"
               >
-                <AlertCircleIcon aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+                <AlertCircleIcon aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
                 <div className="space-y-1">
-                  <p className="font-medium text-red-200">Unable to send message</p>
-                  <p className="text-red-300/90">{serverError}</p>
+                  <p className="font-semibold text-red-900">Submission Error</p>
+                  <p className="text-red-700">{errorMessage || 'Unable to submit form. Please try again.'}</p>
                 </div>
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={status === 'sending'}
-              className={buttonClasses('primary', 'mt-8 w-full sm:w-auto')}
-            >
-              {status === 'sending' ? (
-                <>
-                  <Loader2Icon aria-hidden="true" className="h-4 w-4 animate-spin" />
-                  Sending…
-                </>
-              ) : status === 'error' ? (
-                'Try Again'
-              ) : (
-                'Send Message'
+            {/* Submit Action */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+              <button
+                type="submit"
+                disabled={result === 'Sending....'}
+                className={buttonClasses('primary', 'w-full sm:w-auto inline-flex items-center justify-center gap-2')}
+              >
+                {result === 'Sending....' ? (
+                  <>
+                    <Loader2Icon aria-hidden="true" className="h-4 w-4 animate-spin" />
+                    <span>Sending....</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Submit Form</span>
+                    <SendIcon aria-hidden="true" className="h-3.5 w-3.5" />
+                  </>
+                )}
+              </button>
+
+              {result === 'Sending....' && (
+                <span className="font-mono text-xs text-taupe animate-pulse">
+                  Connecting to Web3Forms…
+                </span>
               )}
-            </button>
+            </div>
           </motion.form>
         )}
       </AnimatePresence>

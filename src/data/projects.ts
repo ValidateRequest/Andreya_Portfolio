@@ -6,25 +6,35 @@ import type { Project, ProjectCategory } from '../types/project';
  */
 
 export const projectCategories: ProjectCategory[] = [
-'Data Analytics',
-'IT / Systems',
-'Database',
-'Business Intelligence'];
-
+  'Virtual Assistance',
+  'Data Analytics',
+  'IT / Systems',
+  'Database',
+  'Business Intelligence'
+];
 
 /** Tools given visual emphasis on project cards. */
-export const dataTools = ['Excel', 'Power BI', 'SQL', 'Python'];
+export const dataTools = ['Excel', 'Power BI', 'SQL', 'Python', 'Microsoft 365', 'Google Workspace'];
 
 export const projects: Project[] = [
-{
-  id: 'data-analytics-case-study',
-  title: 'Data Analytics Case Study',
-  category: 'Data Analytics',
-  description:
-  'Details coming soon. This write-up will cover the question, the dataset, the approach taken and what the analysis showed.',
-  tools: ['Excel', 'Python'],
-  isPlaceholder: true
-},
+  {
+    id: 'virtual-assistance-operations',
+    title: 'Remote Executive & Operations Virtual Support',
+    category: 'Virtual Assistance',
+    description:
+      'Executive scheduling, inbox triage, client communications, spreadsheet data entry, and SOP documentation supporting remote teams.',
+    tools: ['Google Workspace', 'Microsoft 365', 'Excel', 'Trello', 'Slack'],
+    isPlaceholder: true
+  },
+  {
+    id: 'data-analytics-case-study',
+    title: 'Data Analytics Case Study',
+    category: 'Data Analytics',
+    description:
+      'Details coming soon. This write-up will cover the question, the dataset, the approach taken and what the analysis showed.',
+    tools: ['Excel', 'Python'],
+    isPlaceholder: true
+  },
 {
   id: 'business-intelligence-dashboard',
   title: 'Business Intelligence Dashboard',

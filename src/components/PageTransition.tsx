@@ -15,7 +15,7 @@ export function PageTransition({ children }: PageTransitionProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={reduce ? { opacity: 1 } : { opacity: 0 }}
       transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-      className="flex min-h-screen flex-col bg-ink">
+      className="flex min-h-screen flex-col bg-white text-espresso">
       
       <main id="main" className="flex-1">
         {children}

@@ -5,6 +5,7 @@ import { About } from '../pages/About';
 import { Resume } from '../pages/Resume';
 import { Projects } from '../pages/Projects';
 import { Contact } from '../pages/Contact';
+import { KarthyVirtualSolutions } from '../pages/KarthyVirtualSolutions';
 
 export function AnimatedRoutes() {
   const location = useLocation();
@@ -17,8 +18,9 @@ export function AnimatedRoutes() {
         <Route path="/resume" element={<Resume />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/karthy-virtual-solutions" element={<KarthyVirtualSolutions />} />
         <Route path="*" element={<Home />} />
       </Routes>
-    </AnimatePresence>);
-
+    </AnimatePresence>
+  );
 }

@@ -14,7 +14,7 @@ export type FormStatus = 'idle' | 'sending' | 'sent' | 'error';
 const emptyFields: ContactFields = { name: '', email: '', subject: '', message: '' };
 const fieldOrder: (keyof ContactFields)[] = ['name', 'email', 'subject', 'message'];
 
-export function useContactForm(accessKey = 'a00140ed-1808-4e0e-9b61-7b9ba008dfc2') {
+export function useContactForm(accessKey = '5af8f68c-63e8-4e7c-94f2-9908bcf94b09') {
   const [values, setValues] = useState<ContactFields>(emptyFields);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<FormStatus>('idle');
@@ -22,16 +22,16 @@ export function useContactForm(accessKey = 'a00140ed-1808-4e0e-9b61-7b9ba008dfc2
 
   const update =
     (field: keyof ContactFields) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { value } = event.target;
-      setValues((prev) => ({ ...prev, [field]: value }));
-      if (errors[field]) {
-        setErrors((prev) => ({ ...prev, [field]: undefined }));
-      }
-      if (serverError) {
-        setServerError(null);
-      }
-    };
+      (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { value } = event.target;
+        setValues((prev) => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+          setErrors((prev) => ({ ...prev, [field]: undefined }));
+        }
+        if (serverError) {
+          setServerError(null);
+        }
+      };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

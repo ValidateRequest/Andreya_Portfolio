@@ -23,3 +23,8 @@ export interface Certification {
   status: 'Completed' | 'In progress';
   date?: string;
 }
+
+export interface SkillGroup {
+  category: string;
+  items: string[];
+}

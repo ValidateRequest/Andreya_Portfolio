@@ -6,16 +6,38 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#1c2124',
-        surface: '#252b2f',
-        'surface-2': '#2e353a',
-        line: 'rgba(241, 239, 233, 0.14)',
-        paper: '#f1efe9',
-        muted: '#b0b6b5',
+        // Theme Colors
+        beige: {
+          DEFAULT: '#E8DCCB',
+          soft: '#F4ECE1',
+          light: '#FAF6F0',
+          dark: '#DAC7B1',
+        },
+        taupe: {
+          DEFAULT: '#A58A72',
+          light: '#BBA28C',
+          deep: '#8C725C',
+          dark: '#6E5540',
+        },
+        espresso: {
+          DEFAULT: '#3B2D25',
+          light: '#534035',
+          soft: '#6E5D53',
+          dark: '#261C16',
+        },
+        white: '#FFFFFF',
+
+        // Semantic and legacy mappings
+        ink: '#3B2D25',
+        surface: '#FFFFFF',
+        'surface-2': '#F4ECE1',
+        line: 'rgba(165, 138, 114, 0.28)',
+        paper: '#3B2D25',
+        muted: '#736257',
         teal: {
-          DEFAULT: '#2db3a3',
-          light: '#5fd3c4',
-          deep: '#1f8378',
+          DEFAULT: '#A58A72',
+          light: '#BBA28C',
+          deep: '#8C725C',
         },
       },
       fontFamily: {
