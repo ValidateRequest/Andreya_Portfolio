@@ -9,27 +9,31 @@ export interface ContactFields {
 }
 
 type FieldErrors = Partial<Record<keyof ContactFields, string>>;
-type Status = 'idle' | 'sending' | 'sent';
+export type FormStatus = 'idle' | 'sending' | 'sent' | 'error';
 
 const emptyFields: ContactFields = { name: '', email: '', subject: '', message: '' };
 const fieldOrder: (keyof ContactFields)[] = ['name', 'email', 'subject', 'message'];
 
-export function useContactForm(recipient: string) {
+export function useContactForm(accessKey = 'a00140ed-1808-4e0e-9b61-7b9ba008dfc2') {
   const [values, setValues] = useState<ContactFields>(emptyFields);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [status, setStatus] = useState<Status>('idle');
+  const [status, setStatus] = useState<FormStatus>('idle');
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const update =
-  (field: keyof ContactFields) =>
-  (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { value } = event.target;
-    setValues((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
+    (field: keyof ContactFields) =>
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { value } = event.target;
+      setValues((prev) => ({ ...prev, [field]: value }));
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+      }
+      if (serverError) {
+        setServerError(null);
+      }
+    };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const found = validate(values);
     setErrors(found);
@@ -40,24 +44,48 @@ export function useContactForm(recipient: string) {
     }
 
     setStatus('sending');
-    const body = `${values.message.trim()}\n\n— ${values.name.trim()} (${values.email.trim()})`;
-    const href = `mailto:${recipient}?subject=${encodeURIComponent(
-      values.subject.trim()
-    )}&body=${encodeURIComponent(body)}`;
+    setServerError(null);
 
-    window.setTimeout(() => {
-      window.location.href = href;
-      setStatus('sent');
-    }, 400);
+    try {
+      const formData = new FormData(event.currentTarget);
+      formData.set('access_key', accessKey);
+      formData.set('name', values.name.trim());
+      formData.set('email', values.email.trim());
+      formData.set('subject', values.subject.trim() || `New inquiry from ${values.name.trim()}`);
+      formData.set('message', values.message.trim());
+      formData.set('from_name', values.name.trim() || 'Portfolio Visitor');
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json'
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus('sent');
+        setValues(emptyFields);
+      } else {
+        setStatus('error');
+        setServerError(data.message || 'Unable to send message. Please try again.');
+      }
+    } catch {
+      setStatus('error');
+      setServerError('Unable to reach the email service. Please check your connection or contact me directly.');
+    }
   };
 
   const reset = () => {
     setValues(emptyFields);
     setErrors({});
+    setServerError(null);
     setStatus('idle');
   };
 
-  return { values, errors, status, update, handleSubmit, reset };
+  return { values, errors, status, serverError, update, handleSubmit, reset };
 }
 
 function validate(values: ContactFields): FieldErrors {
